@@ -105,8 +105,10 @@ public class ViewDrink extends Fragment implements SetProfile.WeightGenderInterf
         viewDrink.findViewById(R.id.close_view).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //getActivity().getSupportFragmentManager().popBackStack();;
 
                 vd.goBacktoBAC();
+
 
             }
         });

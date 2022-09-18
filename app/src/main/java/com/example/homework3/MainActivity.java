@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements BACCalculator.BAC
     public void goBacktoBAC() {
 
        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,new BACCalculator(),"BACFragment")
-               .commitNow();
+               .addToBackStack(null).commit();
 
     }
 
