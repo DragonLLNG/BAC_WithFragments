@@ -82,8 +82,6 @@ public class SetProfile extends Fragment {
         setw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
                 try{
                     weight_input = profileView.findViewById(R.id.weight_input);
                     num_weight = Double.parseDouble(weight_input.getText().toString());

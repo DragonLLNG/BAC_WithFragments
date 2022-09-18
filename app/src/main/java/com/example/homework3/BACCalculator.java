@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,9 +74,10 @@ public class BACCalculator extends Fragment {
          */
 
 
-    TextView bacTxt, status, numDrinksTxt, usrWeight;
+    TextView bacTxt, status, numDrinksTxt, userWeight;
     static Profile user = new Profile();
     static ArrayList<Drink> drinksList = new ArrayList<Drink>();
+    Button addDrinkBt, viewDrinkBt;
 
 
     public void updateBAC(Profile user, ArrayList<Drink> drinksList) {
@@ -98,10 +100,6 @@ public class BACCalculator extends Fragment {
         View bacView = inflater.inflate(R.layout.fragmentbaccalculator, container, false);
 
 
-        TextView userWeight = bacView.findViewById(R.id.initial_weight);
-        TextView numDrinks = bacView.findViewById(R.id.num_drink);
-        bacTxt = bacView.findViewById(R.id.bac_level);
-
 
         //Click Set button
         bacView.findViewById(R.id.set).setOnClickListener(new View.OnClickListener() {
@@ -111,31 +109,48 @@ public class BACCalculator extends Fragment {
             }
         });
 
+        userWeight = bacView.findViewById(R.id.initial_weight);
+        numDrinksTxt = bacView.findViewById(R.id.num_drink);
+        bacTxt = bacView.findViewById(R.id.bac_level);
+        addDrinkBt = bacView.findViewById(R.id.add_drink);
+        viewDrinkBt = bacView.findViewById(R.id.view_drink);
+
 
         //Display user input weight and gender
         userWeight.setText(weightOut);
 
-        //Display number of added drinks
-        numDrinks.setText(String.valueOf(this.numDrinks));
 
+        //Disable Add Drink and View Drinks button when there's no weight and gender output
+        if(userWeight.getText().length()==0){
+            addDrinkBt.setEnabled(false);
+            viewDrinkBt.setEnabled(false);
+        }
+
+
+        //Display number of added drinks
+        numDrinksTxt.setText(String.valueOf(this.numDrinks));
+
+
+        //BAC calculation
         double bacNum = 0.0;
         double consumed = 0.0;
 
 
-
         for (int i = 0; i < drinksList.size(); i++) {
             consumed += drinksList.get(i).getAlcPercent()*drinksList.get(i).getSize();
+            System.out.println(consumed);
         }
         if (user.getGender()=="Male") {
-            bacNum = consumed * 5.14 / user.getWeight() * 0.73;
-            System.out.println(bac);
+            bacNum = (consumed * 5.14)/(user.getWeight() * 0.73);
+            System.out.println(bacNum);
         } else {
-            bacNum = consumed * 5.14 / user.getWeight() * 0.66;
+            bacNum = (consumed * 5.14)/(user.getWeight() * 0.66);
+
+            System.out.println(user.getWeight());
+            System.out.println(bacNum);
+
         }
 
-        //Outputting the bac
-        String bacString = Double.toString(bacNum);
-        bacTxt.setText(String.format("%.3f", bacNum));
 
         //Changing the color of the status bar
         status = bacView.findViewById(R.id.status);
@@ -143,18 +158,20 @@ public class BACCalculator extends Fragment {
         GradientDrawable drawable = (GradientDrawable) status.getBackground();
 
         if (bacNum >= 0.25) {
-
+            System.out.println(bacNum);
             //disable add drink
+            addDrinkBt.setEnabled(false);
             bacView.findViewById(R.id.add_drink).setEnabled(false);
             status.setText("Over the limit");
             drawable.setColor(Color.RED);
-
+            addDrinkBt.setEnabled(false);
 
             Toast overLimit = Toast.makeText(getActivity(), "No more drinks for you!", Toast.LENGTH_LONG);
             overLimit.setGravity(Gravity.CENTER, 0, 0);
             overLimit.show();
+        }
 
-        } else if (bacNum > 0.2) {
+        else if (bacNum > 0.2) {
             status.setText("Over the limit");
             drawable.setColor(Color.RED);
 
@@ -167,8 +184,14 @@ public class BACCalculator extends Fragment {
         }
 
 
+        //Outputting the bac
+        bacTxt.setText(String.format("%.3f", bacNum));
+
+
+
+
         //Click Add Drink button
-        bacView.findViewById(R.id.add_drink).setOnClickListener(new View.OnClickListener() {
+        addDrinkBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 bac.gotoAddDrink();
@@ -176,9 +199,16 @@ public class BACCalculator extends Fragment {
         });
 
         //Click View Drink
-        bacView.findViewById(R.id.view_drink).setOnClickListener(new View.OnClickListener() {
+        viewDrinkBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (drinksList.size()==0){
+
+                    Toast overLimit = Toast.makeText(getActivity(), "There is no drinks!", Toast.LENGTH_SHORT);
+                    overLimit.setGravity(Gravity.CENTER, 0, 0);
+                    overLimit.show();
+
+                }
                 bac.gotoViewDrink();
                 bac.gotoViewDrink2(drinksList);
             }
@@ -192,12 +222,14 @@ public class BACCalculator extends Fragment {
                 //TextView bacOutTxt = bacView.findViewById(R.id.bac_level);
 
                 try {
+                    addDrinkBt.setEnabled(false);
+                    viewDrinkBt.setEnabled(false);
                     status.setBackgroundResource(R.drawable.roundedcorner);
                     GradientDrawable drawable = (GradientDrawable) status.getBackground();
                     drinksList.clear();
                     bacTxt.setText("0.000");
-                    usrWeight.setText("N/A");
-                    numDrinks.setText("0");
+                    userWeight.setText("N/A");
+                    numDrinksTxt.setText("0");
                     status.setText("You're safe");
                     drawable.setColor(Color.GREEN);
                     user = new Profile();
@@ -227,7 +259,7 @@ public class BACCalculator extends Fragment {
         if (context instanceof BAC_interface) {
             bac = (BAC_interface) context;
         } else {
-            throw new RuntimeException(context.toString() + "must implement MaintIn");
+            throw new RuntimeException(context.toString() + "must implement BAC_interface");
         }
     }
 }

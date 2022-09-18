@@ -57,8 +57,10 @@ public class MainActivity extends AppCompatActivity implements BACCalculator.BAC
 
     @Override
     public void goBacktoBAC() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,new BACCalculator(),"BACFragment")
-        .commitNow();
+
+       getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,new BACCalculator(),"BACFragment")
+               .addToBackStack(null).commitNow();
+
     }
 
     @Override
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements BACCalculator.BAC
 
     @Override
     public void goBacktoBAC1() {
+
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,new BACCalculator(),"BACFragment")
                 .commitNow();
     }
