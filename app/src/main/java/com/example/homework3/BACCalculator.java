@@ -219,8 +219,6 @@ public class BACCalculator extends Fragment {
             @Override
             public void onClick(View view) {
 
-                //TextView bacOutTxt = bacView.findViewById(R.id.bac_level);
-
                 try {
                     addDrinkBt.setEnabled(false);
                     viewDrinkBt.setEnabled(false);
