@@ -3,7 +3,9 @@ package com.example.homework3;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Profile{
+import java.io.Serializable;
+
+public class Profile implements Serializable {
     double weight;
     String gender;
 

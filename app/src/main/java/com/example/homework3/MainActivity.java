@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements BACCalculator.BAC_interface, SetProfile.WeightGenderInterface, AddDrink.AddDrinkInterface {
+public class MainActivity extends AppCompatActivity implements BACCalculator.BAC_interface, SetProfile.sendWeightGenderInterface, AddDrink.AddDrinkInterface, ViewDrink.ViewDrinksInterface {
 
 
 
@@ -51,56 +51,58 @@ public class MainActivity extends AppCompatActivity implements BACCalculator.BAC
 
 
     Profile user;
-    Drink drinkAdded;
-    ArrayList<Drink> drinksList = new ArrayList<Drink>();
-
-
-    @Override
-    public void goBacktoBAC() {
-
-       getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,new BACCalculator(),"BACFragment")
-               .addToBackStack(null).commit();
-
-    }
+    ArrayList<Drink> drinksList = new ArrayList<>();
 
     @Override
     public void setWeighGender(Profile profile) {
+
         user = profile;
-        BACCalculator bacFragment = (BACCalculator) getSupportFragmentManager().findFragmentByTag("BACFragment");
-        bacFragment.updateBAC(user,new ArrayList<Drink>());
 
-    }
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, BACCalculator.newInstance(user,drinksList),"BACFragment")
+                .commit();
+        //getSupportFragmentManager().popBackStack();
 
-    @Override
-    public void goBacktoBAC1() {
-
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,new BACCalculator(),"BACFragment")
-                .commitNow();
     }
 
     @Override
     public void setDrink(Drink drink) {
-        drinkAdded = drink;
-        drinksList.add(drinkAdded);
-        BACCalculator bacFragment1 = (BACCalculator) getSupportFragmentManager().findFragmentByTag("BACFragment");
-        bacFragment1.updateBAC(user,drinksList);
-
-    }
-
-
-    @Override
-    public void gotoViewDrink() {
-        setTitle("View Drinks");
+        drinksList.add(drink);
+        //BACCalculator bacFragment1 = (BACCalculator) getSupportFragmentManager().findFragmentByTag("BACFragment");
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer,new ViewDrink(),"ViewDrinkFragment")
-                .commitNow();
+                .replace(R.id.fragmentContainer, BACCalculator.newInstance(user, drinksList),"BACFragment")
+                .commit();
+        //getSupportFragmentManager().popBackStack();
+
+    }
+
+
+
+
+    @Override
+    public void gotoViewDrink(ArrayList<Drink> drinkData) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, ViewDrink.newInstance(drinksList),"ViewDrinkFragment")
+                .commit();
+    }
+
+
+    @Override
+    public void deletedDrink(Drink drinkDeleted) {
+        drinksList.remove(drinkDeleted);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, BACCalculator.newInstance(user,drinksList),"BACFragment")
+                .commit();
+
 
     }
 
     @Override
-    public void gotoViewDrink2(ArrayList<Drink> drinkData) {
-        drinksList = drinkData;
-        ViewDrink viewDrinkFragment = (ViewDrink) getSupportFragmentManager().findFragmentByTag("ViewDrinkFragment");
-        viewDrinkFragment.updateDrinkList(drinksList);
+    public void updatedDrinklists(ArrayList<Drink> updatedDrinksList) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, BACCalculator.newInstance(user, updatedDrinksList),"BACFragment")
+                .commit();
     }
+
+
 }

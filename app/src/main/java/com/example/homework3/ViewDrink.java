@@ -1,10 +1,10 @@
 package com.example.homework3;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -19,35 +19,28 @@ import java.util.ArrayList;
  * Use the {@link ViewDrink#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ViewDrink extends Fragment implements SetProfile.WeightGenderInterface {
+public class ViewDrink extends Fragment{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_DRINKLIST = "param_drinkList";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private TextView label, size, percent, dateAdded;
+    private int iterator = 0;
+    private ArrayList<Drink> drinkList = new ArrayList<Drink>();
+    private Drink drinkRemove;
 
     public ViewDrink() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ViewDrink.
-     */
+
     // TODO: Rename and change types and number of parameters
-    public static ViewDrink newInstance(String param1, String param2) {
+    public static ViewDrink newInstance(ArrayList<Drink> list) {
         ViewDrink fragment = new ViewDrink();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putParcelableArrayList(ARG_DRINKLIST, list);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,33 +49,27 @@ public class ViewDrink extends Fragment implements SetProfile.WeightGenderInterf
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            drinkList = getArguments().getParcelableArrayList(ARG_DRINKLIST);
         }
     }
 
-
-
-    private TextView label, size, percent, dateAdded;
-    private int iterator = 0;
-    private ArrayList<Drink> drinkList = new ArrayList<Drink>();
-
-
-    public void updateDrinkList(ArrayList<Drink> drinkList){
-        this.drinkList = drinkList;
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View viewDrink = inflater.inflate(R.layout.fragmentviewdrink, container, false);
+        return viewDrink;
+    }
 
-        label = viewDrink.findViewById(R.id.num_drinks_view);
-        size = viewDrink.findViewById(R.id.drink_size_view);
-        percent = viewDrink.findViewById(R.id.percent_view);
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        label = view.findViewById(R.id.num_drinks_view);
+        size = view.findViewById(R.id.drink_size_view);
+        percent = view.findViewById(R.id.percent_view);
 
         if(drinkList.size() != 0){
 
@@ -100,22 +87,9 @@ public class ViewDrink extends Fragment implements SetProfile.WeightGenderInterf
             percent.setText(percentStr + "% Alcohol");
         }
 
-
-
-        viewDrink.findViewById(R.id.close_view).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                //getActivity().getSupportFragmentManager().popBackStack();;
-
-                vd.goBacktoBAC();
-
-
-            }
-        });
-
-        viewDrink.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+            public void onClick(View view1) {
 
 
                 iterator++;
@@ -138,9 +112,9 @@ public class ViewDrink extends Fragment implements SetProfile.WeightGenderInterf
             }
         });
 
-        viewDrink.findViewById(R.id.previous).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.previous).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view2) {
                 iterator--;
                 if( iterator < 0){
                     iterator = drinkList.size() - 1;
@@ -162,9 +136,10 @@ public class ViewDrink extends Fragment implements SetProfile.WeightGenderInterf
         });
 
 
-        viewDrink.findViewById(R.id.trash).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.trash).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view3) {
+                drinkRemove = drinkList.get(iterator);
                 drinkList.remove(iterator);
                 iterator -= 1;
                 if(drinkList.size() != 0){
@@ -190,30 +165,39 @@ public class ViewDrink extends Fragment implements SetProfile.WeightGenderInterf
                     label.setText("Drink # out of N");
                     size.setText("1 oz");
                     percent.setText("x% Alcohol");
+                    vd.deletedDrink(drinkRemove);
                 }
             }
         });
 
-        return viewDrink;
+
+
+        view.findViewById(R.id.close_view).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                vd.updatedDrinklists(drinkList);
+            }
+        });
+
+
+
     }
 
-    SetProfile.WeightGenderInterface vd;
-    @Override
-    public void goBacktoBAC() {
+    ViewDrinksInterface vd;
 
-    }
-
-    @Override
-    public void setWeighGender(Profile profile) {
+    public interface ViewDrinksInterface {
+        void deletedDrink(Drink drinkDeleted);
+        void updatedDrinklists(ArrayList<Drink> updatedDrinksList);
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof SetProfile.WeightGenderInterface) {
-            vd = (SetProfile.WeightGenderInterface) context;
+        if (context instanceof ViewDrinksInterface) {
+            vd = (ViewDrinksInterface) context;
         } else {
-            throw new RuntimeException(context.toString() + "must implement WeightGenderInterface");
+            throw new RuntimeException(context.toString() + "must implement ViewDrinksInterface");
         }
     }
+
 }

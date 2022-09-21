@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.Gravity;
@@ -31,67 +32,50 @@ public class BACCalculator extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    private static final String ARG_PARAM3 = "param3";
+    private static final String ARG_PROFILE = "param_profile";
+    private static final String ARG_DRINK = "param_drink";
+    //private static final String ARG_PARAM3 = "param3";
 
     // TODO: Rename and change types of parameters
     private String weightOut;
     private Integer numDrinks;
     private double bacOut;
 
+    private Profile profile = new Profile(0.0,"");
+    private ArrayList<Drink> drinksList = new ArrayList<Drink>();
+
+
     public BACCalculator() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment BACCalculator.
-     */
+
     // TODO: Rename and change types and number of parameters
-    public static BACCalculator newInstance(String param1, String param2) {
+    public static BACCalculator newInstance(Profile profile, ArrayList<Drink> drinksList) {
         BACCalculator fragment = new BACCalculator();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable(ARG_PROFILE, profile);
+        args.putParcelableArrayList(ARG_DRINK, drinksList);
         fragment.setArguments(args);
         return fragment;
     }
-    /*
+
     @Override
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            profile = (Profile) getArguments().getSerializable(ARG_PROFILE);
+            drinksList = getArguments().getParcelableArrayList(ARG_DRINK);
         }
-}
-         */
+    }
 
 
     TextView bacTxt, status, numDrinksTxt, userWeight;
-    static Profile user = new Profile();
-    static ArrayList<Drink> drinksList = new ArrayList<Drink>();
+    
     Button addDrinkBt, viewDrinkBt;
 
 
-    public void updateBAC(Profile user, ArrayList<Drink> drinksList) {
-        try {
-            this.user = user;
-            this.drinksList = drinksList;
-            this.bacOut = bacOut;
-            weightOut = this.user.getWeight() + " lbs" + "(" + this.user.getGender() + ")";
-            numDrinks = this.drinksList.size();
-        }
-        catch (Resources.NotFoundException e){
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -100,34 +84,51 @@ public class BACCalculator extends Fragment {
         View bacView = inflater.inflate(R.layout.fragmentbaccalculator, container, false);
 
 
+        return bacView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view1, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view1, savedInstanceState);
+
+
+        userWeight = view1.findViewById(R.id.initial_weight);
+        numDrinksTxt = view1.findViewById(R.id.num_drink);
+        bacTxt = view1.findViewById(R.id.bac_level);
+        addDrinkBt = view1.findViewById(R.id.add_drink);
+        viewDrinkBt = view1.findViewById(R.id.view_drink);
 
         //Click Set button
-        bacView.findViewById(R.id.set).setOnClickListener(new View.OnClickListener() {
+        view1.findViewById(R.id.set).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 bac.gotoSetProfile();
             }
         });
 
-        userWeight = bacView.findViewById(R.id.initial_weight);
-        numDrinksTxt = bacView.findViewById(R.id.num_drink);
-        bacTxt = bacView.findViewById(R.id.bac_level);
-        addDrinkBt = bacView.findViewById(R.id.add_drink);
-        viewDrinkBt = bacView.findViewById(R.id.view_drink);
+        //Click Add Drink button
+        addDrinkBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bac.gotoAddDrink();
+            }
+        });
 
 
         //Display user input weight and gender
+        weightOut = profile.getWeight()+" lbs("+profile.getGender()+")";
         userWeight.setText(weightOut);
 
 
         //Disable Add Drink and View Drinks button when there's no weight and gender output
-        if(userWeight.getText().length()==0){
+        if(profile.getWeight()==0 && profile.getGender().isEmpty()){
             addDrinkBt.setEnabled(false);
             viewDrinkBt.setEnabled(false);
         }
 
 
         //Display number of added drinks
+        numDrinks = drinksList.size();
         numDrinksTxt.setText(String.valueOf(this.numDrinks));
 
 
@@ -140,20 +141,21 @@ public class BACCalculator extends Fragment {
             consumed += drinksList.get(i).getAlcPercent()*drinksList.get(i).getSize();
             System.out.println(consumed);
         }
-        if (user.getGender()=="Male") {
-            bacNum = (consumed * 5.14)/(user.getWeight() * 0.73);
+
+        if (profile.getGender()=="Male") {
+            bacNum = (consumed * 5.14)/(profile.getWeight() * 0.73);
             System.out.println(bacNum);
         } else {
-            bacNum = (consumed * 5.14)/(user.getWeight() * 0.66);
+            bacNum = (consumed * 5.14)/(profile.getWeight() * 0.66);
 
-            System.out.println(user.getWeight());
+            System.out.println(profile.getWeight());
             System.out.println(bacNum);
 
         }
 
 
         //Changing the color of the status bar
-        status = bacView.findViewById(R.id.status);
+        status = view1.findViewById(R.id.status);
         status.setBackgroundResource(R.drawable.roundedcorner);
         GradientDrawable drawable = (GradientDrawable) status.getBackground();
 
@@ -161,10 +163,10 @@ public class BACCalculator extends Fragment {
             System.out.println(bacNum);
             //disable add drink
             addDrinkBt.setEnabled(false);
-            bacView.findViewById(R.id.add_drink).setEnabled(false);
+            view1.findViewById(R.id.add_drink).setEnabled(false);
             status.setText("Over the limit");
             drawable.setColor(Color.RED);
-            addDrinkBt.setEnabled(false);
+
 
             Toast overLimit = Toast.makeText(getActivity(), "No more drinks for you!", Toast.LENGTH_LONG);
             overLimit.setGravity(Gravity.CENTER, 0, 0);
@@ -190,32 +192,23 @@ public class BACCalculator extends Fragment {
 
 
 
-        //Click Add Drink button
-        addDrinkBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                bac.gotoAddDrink();
-            }
-        });
+
 
         //Click View Drink
         viewDrinkBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (drinksList.size()==0){
-
                     Toast overLimit = Toast.makeText(getActivity(), "There is no drinks!", Toast.LENGTH_SHORT);
                     overLimit.setGravity(Gravity.CENTER, 0, 0);
                     overLimit.show();
-
                 }
-                bac.gotoViewDrink();
-                bac.gotoViewDrink2(drinksList);
+                bac.gotoViewDrink(drinksList);
             }
         });
 
         //Click Reset button
-        bacView.findViewById(R.id.reset).setOnClickListener(new View.OnClickListener() {
+        view1.findViewById(R.id.reset).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -230,7 +223,7 @@ public class BACCalculator extends Fragment {
                     numDrinksTxt.setText("0");
                     status.setText("You're safe");
                     drawable.setColor(Color.GREEN);
-                    user = new Profile();
+                    profile = new Profile();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -238,17 +231,14 @@ public class BACCalculator extends Fragment {
 
             }
         });
-        return bacView;
     }
-
 
     //BAC interface
     BAC_interface bac;
     public interface BAC_interface{
         void gotoSetProfile();
         void gotoAddDrink();
-        void gotoViewDrink();
-        void gotoViewDrink2(ArrayList<Drink> drinkArrayList);
+        void gotoViewDrink(ArrayList<Drink> drinkArrayList);
     }
 
     @Override
