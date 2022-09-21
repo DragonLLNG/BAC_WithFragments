@@ -219,7 +219,6 @@ public class BACCalculator extends Fragment {
                     viewDrinkBt.setEnabled(false);
                     status.setBackgroundResource(R.drawable.roundedcorner);
                     GradientDrawable drawable = (GradientDrawable) status.getBackground();
-
                     drawable.setColor(Color.GREEN);
 
 
