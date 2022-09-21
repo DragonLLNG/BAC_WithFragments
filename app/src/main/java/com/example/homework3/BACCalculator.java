@@ -213,21 +213,20 @@ public class BACCalculator extends Fragment {
             public void onClick(View view) {
 
                 try {
+
+                    bac.reset();
                     addDrinkBt.setEnabled(false);
                     viewDrinkBt.setEnabled(false);
                     status.setBackgroundResource(R.drawable.roundedcorner);
                     GradientDrawable drawable = (GradientDrawable) status.getBackground();
-                    drinksList.clear();
-                    bacTxt.setText("0.000");
-                    userWeight.setText("N/A");
-                    numDrinksTxt.setText("0");
-                    status.setText("You're safe");
+
                     drawable.setColor(Color.GREEN);
-                    profile = new Profile();
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
 
             }
         });
@@ -239,6 +238,7 @@ public class BACCalculator extends Fragment {
         void gotoSetProfile();
         void gotoAddDrink();
         void gotoViewDrink(ArrayList<Drink> drinkArrayList);
+        void reset();
     }
 
     @Override

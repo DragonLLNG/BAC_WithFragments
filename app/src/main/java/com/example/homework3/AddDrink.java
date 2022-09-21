@@ -1,8 +1,12 @@
 package com.example.homework3;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +20,7 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 public class AddDrink extends Fragment {
 
@@ -34,6 +39,7 @@ public class AddDrink extends Fragment {
     RadioGroup drinkSize;
     SeekBar alcohol;
     double alcoholPercent;
+    Date date;
     TextView percentStr;
 
 
@@ -99,7 +105,10 @@ public class AddDrink extends Fragment {
                     ounces = 12;
                 }
                 double decimal = alcoholPercent/100;
-                Drink newDrink = new Drink(decimal, ounces);
+
+
+                date = new Date();
+                Drink newDrink = new Drink(decimal, ounces, date);
                 dr.setDrink(newDrink);
                 getActivity().getSupportFragmentManager().popBackStack();
             }

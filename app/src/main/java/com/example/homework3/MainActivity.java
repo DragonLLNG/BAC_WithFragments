@@ -87,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements BACCalculator.BAC
     }
 
 
+
+
     @Override
     public void deletedDrink(Drink drinkDeleted) {
         drinksList.remove(drinkDeleted);
@@ -103,6 +105,20 @@ public class MainActivity extends AppCompatActivity implements BACCalculator.BAC
                 .replace(R.id.fragmentContainer, BACCalculator.newInstance(user, updatedDrinksList),"BACFragment")
                 .commit();
     }
+
+
+    @Override
+    public void reset() {
+        user = new  Profile(0.0,"");
+        drinksList.clear();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, BACCalculator.newInstance(user, drinksList),"BACFragment")
+                .commit();
+
+    }
+
+
+
 
 
 }

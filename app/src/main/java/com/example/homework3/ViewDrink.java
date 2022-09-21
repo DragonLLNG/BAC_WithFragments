@@ -12,7 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,6 +73,7 @@ public class ViewDrink extends Fragment{
         label = view.findViewById(R.id.num_drinks_view);
         size = view.findViewById(R.id.drink_size_view);
         percent = view.findViewById(R.id.percent_view);
+        dateAdded = view.findViewById(R.id.date);
 
         if(drinkList.size() != 0){
 
@@ -85,6 +89,12 @@ public class ViewDrink extends Fragment{
             //Percent
             String percentStr = Double.toString(drinkList.get(iterator).getAlcPercent()*100);
             percent.setText(percentStr + "% Alcohol");
+
+
+            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm aa");
+            Date date = drinkList.get(iterator).getDate();
+
+            dateAdded.setText("Added " + dateFormat.format(date));
         }
 
         view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {

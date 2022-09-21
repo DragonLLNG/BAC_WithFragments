@@ -3,17 +3,19 @@ package com.example.homework3;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
 
+import java.util.Date;
 public class Drink implements Parcelable {
 
     private double alcPercent;
     private int size;
+    private Date date;
 
 
-    public Drink(double percent, int size){
+    public Drink(double percent, int size, Date date){
         this.alcPercent = percent;
         this.size = size;
+        this.date = date;
     }
 
     protected Drink(Parcel in) {
@@ -40,6 +42,7 @@ public class Drink implements Parcelable {
     public int getSize(){
         return this.size;
     }
+    public Date getDate() {return this.date; }
     //Setters
     public void setAlcPercent(double percent){
         this.alcPercent = percent;
@@ -48,6 +51,8 @@ public class Drink implements Parcelable {
     public void setSize(int size){
         this.size = size;
     }
+
+    public void setDate(Date date) {this.date = date; }
 
 
     @Override
